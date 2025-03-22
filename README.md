@@ -7,4 +7,4 @@
 - - API_BASE_URL=https://api.currencybeacon.com/v1
  - - CURRENCY_API_KEY=your_api_key_here
 
-## Run the development server: `npm run dev`
+## Run the development server: `npm run dev` ->  http://localhost:3000/
