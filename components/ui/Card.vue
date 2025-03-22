@@ -6,6 +6,9 @@
     <div class="px-6 py-4">
       <slot></slot>
     </div>
+    <div v-if="$slots.footer" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+      <slot name="footer"></slot>
+    </div>
   </div>
 </template>
 
