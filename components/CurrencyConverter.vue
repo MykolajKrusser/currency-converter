@@ -59,10 +59,8 @@
         </UiButton>
       </div>
 
-      <div class="min-h-5">
-        <div v-if="lastUpdated" class="text-sm text-gray-500 text-center mt-2">
-          Last updated: {{ lastUpdated }}
-        </div>
+      <div v-if="lastUpdated" class="text-sm text-gray-500 text-center mt-2">
+        Last updated: {{ lastUpdated }}
       </div>
     </div>
   </UiCard>
@@ -71,8 +69,9 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { useCurrency } from '~/composables/useCurrency';
+import debounce from 'lodash/debounce'
 
-const { currencies, loading, error, fetchCurrencies, convertCurrency } = useCurrency();
+const { currencies, loading, error, convertCurrency, initCurrency } = useCurrency();
 
 // State
 const fromCurrency = ref('');
@@ -106,26 +105,14 @@ const convert = async () => {
 };
 
 // Auto-convert when inputs change
-watch([fromCurrency, toCurrency, amount], () => {
+watch([fromCurrency, toCurrency, amount], debounce(() => {
   if (canConvert.value) {
     convert();
   }
-}, { deep: true });
+}, 500), { deep: true });
 
 // Load currencies on mount
 onMounted(async () => {
-  await fetchCurrencies();
-
-  // Set default currencies if available
-  if (currencies.value.length > 0) {
-    // Find USD and EUR if available, otherwise use first two currencies
-    const usdCurrency = currencies.value.find(c => c.value === 'USD');
-    const eurCurrency = currencies.value.find(c => c.value === 'EUR');
-
-    fromCurrency.value = usdCurrency ? usdCurrency.value : currencies.value[0].value;
-    toCurrency.value = eurCurrency ? eurCurrency.value : (
-        currencies.value[1] ? currencies.value[1].value : currencies.value[0].value
-    );
-  }
+  await initCurrency();
 });
 </script>
